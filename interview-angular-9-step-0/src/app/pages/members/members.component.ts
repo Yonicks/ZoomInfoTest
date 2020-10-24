@@ -1,32 +1,73 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ListItem} from '../../common/models/list-item';
+import {IListItem, ListItem} from '../../common/models/i-list-item';
 import {Observable, Subscription} from 'rxjs';
 import {Member} from '../../common/models/member';
-import {MembersState} from "../../ngrx/state/members.state";
-import {FetchMembers} from "../../ngrx/action/members.actions";
-import {Store} from "@ngrx/store";
+import {map} from 'rxjs/operators';
+import {MembersFacdeService} from '../services/members-facde.service';
 
 
 @Component({
   selector: 'zi-members',
-  templateUrl: './members.component.html',
+  template: `
+    <div class="container">
+
+      <div class="container-top">
+        <h1 class="header">{{selectedMember?.label ? selectedMember?.label : 'Please select a member'}}</h1>
+      </div>
+
+      <div class="container-bottom">
+        <zi-list [headerText]="'Members'" [items]="listItems$ | async"
+                 (itemSelected)="itemSelected($event)"
+                 [selectedItem]="selectedItem$ | async"
+                 [showLoader]="isLoading$ | async">
+        </zi-list>
+
+        <member-hierarchy [hierarchyList]="selectedMemberHierarchyList$ | async"></member-hierarchy>
+
+
+      </div>
+
+    </div>
+
+  `,
   styleUrls: ['./members.component.scss']
 })
 export class MembersComponent implements OnInit, OnDestroy {
 
-  listItems$: Observable<ListItem[]>;
+  listItems$: Observable<IListItem[]>;
+  selectedMemberHierarchyList$: Observable<Member[]>;
+  members$: Observable<Member[]>;
+  selectedItem$: Observable<IListItem>;
   subscriptions: Subscription = new Subscription();
-  selectedMember: ListItem;
-  isLoading: boolean;
+  selectedMember: IListItem;
+  isLoading$: Observable<boolean>;
 
-  constructor(private membersStore: Store<MembersState>) {}
+  constructor(private membersFacdeService: MembersFacdeService) {
+    this.members$ = this.membersFacdeService.getMembers();
 
-  ngOnInit() {
-    this.membersStore.dispatch(FetchMembers());
+    this.listItems$ = this.members$.pipe(map((mList: Member[]) => mList.map((m: Member) => new ListItem(m.id, m.name))));
+
+    this.selectedItem$ = this.membersFacdeService.getSelectedMember();
+
+    this.isLoading$ = this.membersFacdeService.getIsLoading();
+
+
+    this.selectedMemberHierarchyList$ = this.membersFacdeService.getSelectedMemberHierarchyList();
+
+    this.subscriptions = this.selectedItem$.subscribe((m: IListItem) => {
+      if (m.id && m.label) {
+        this.membersFacdeService.loadHierarchy(m.id);
+      }
+    });
 
   }
 
-  memberSelected(member) {
+  ngOnInit() {
+    this.membersFacdeService.loadMembers();
+  }
+
+  itemSelected(itemSelected: IListItem) {
+    this.membersFacdeService.itemSelected(itemSelected);
 
   }
 

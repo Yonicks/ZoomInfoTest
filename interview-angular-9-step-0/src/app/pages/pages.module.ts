@@ -8,6 +8,9 @@ import {ZiCommonModule} from '../common/common.module';
 import {EffectsModule} from '@ngrx/effects';
 import {MembersEffects} from '../ngrx/effect/members.effects';
 import {MembersService} from './services/members.service';
+import {MemberHierarchyComponent} from './components/member-hierarchy/member-hierarchy.component';
+import { MemberDetailsComponent } from './components/member-details/member-details.component';
+import {RouterModule} from '@angular/router';
 
 
 
@@ -16,12 +19,15 @@ import {MembersService} from './services/members.service';
     CommonModule,
     ZiCommonModule,
     EffectsModule.forRoot([MembersEffects]),
+    RouterModule,
   ],
   declarations: [
     ListComponent,
     MembersComponent,
     NavBarComponent,
-    PagesComponent
+    PagesComponent,
+    MemberHierarchyComponent,
+    MemberDetailsComponent
   ],
   providers: [
     MembersService

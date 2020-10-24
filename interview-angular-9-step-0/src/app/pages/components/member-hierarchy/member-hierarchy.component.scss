@@ -1,0 +1,30 @@
+@import "../../../../styles/base";
+
+%selected {
+  background: $green-color;
+}
+
+:host {
+  border: 1px solid $main-border-color;
+  border-radius: 3px;
+}
+
+.hierarchyItem, .hierarchyItem a {
+  font-size: 20px;
+  margin-right: 20px;
+}
+
+.hierarchyItem a {
+  color: #70bdff;
+}
+
+.hierarchyItem:not(:last-of-type):after {
+  content: '->';
+}
+
+.hierarchyArea {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+
