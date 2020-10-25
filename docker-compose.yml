@@ -1,0 +1,13 @@
+version: '2' # specify docker-compose version
+
+services:
+  client: # name of the first service
+    build: interview-angular-9-step-0 # specify the directory of the Dockerfile
+    ports:
+      - "4200:4200" # specify port forewarding
+
+  server: #name of the second service
+    build: interview-node-2-moriah-solution # specify the directory of the Dockerfile
+    ports:
+      - "5000:5000" #specify ports forewarding
+
